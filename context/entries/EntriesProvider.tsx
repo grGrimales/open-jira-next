@@ -3,6 +3,7 @@ import { useSnackbar } from 'notistack';
 import { EntriesContext, entriesReducer } from './';
 import { Entry } from '../../interface';
 import { entriesApi } from '../../apis';
+import { useRouter } from 'next/router';
 
 
 export interface EntriesState {
@@ -15,7 +16,10 @@ const Entries_INITIAL_STATE: EntriesState = {
 }
 
 
+
 export const EntriesProvider: FC<PropsWithChildren<any>> = ({ children }) => {
+
+    const router = useRouter();
 
     const [state, dispatch] = useReducer(entriesReducer, Entries_INITIAL_STATE);
 
@@ -56,10 +60,41 @@ export const EntriesProvider: FC<PropsWithChildren<any>> = ({ children }) => {
     }
 
 
+    const deleteEntry = async (entry: Entry, showSnackbar = false) => {
+
+        try {
+
+            const { data } = await entriesApi.delete<Entry>(`/entries/${entry._id}`)
+
+            dispatch({ type: '[Entry] Delete-Entry', payload: entry })
+            if (showSnackbar)
+                enqueueSnackbar('Se elimino correctamente', {
+                    variant: 'success',
+                    autoHideDuration: 1500,
+                    anchorOrigin: {
+                        vertical: 'top',
+                        horizontal: 'right'
+
+                    }
+
+
+
+
+
+                })
+
+            router.push('/')
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     const refreshEntries = async () => {
 
         const { data } = await entriesApi.get<Entry[]>('/entries');
         dispatch({ type: '[Entry] Refresh-Data', payload: data })
+
     }
 
     useEffect(() => {
@@ -73,8 +108,13 @@ export const EntriesProvider: FC<PropsWithChildren<any>> = ({ children }) => {
 
             addNewEntry,
             updateEntry,
+            deleteEntry
         }}>
             {children}
         </EntriesContext.Provider>
     )
+}
+
+function useNavigate() {
+    throw new Error('Function not implemented.');
 }

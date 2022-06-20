@@ -22,7 +22,7 @@ interface Props {
 const EntryPage: FC<Props> = ({ entry }) => {
 
 
-    const { updateEntry } = useContext(EntriesContext);
+    const { updateEntry, deleteEntry } = useContext(EntriesContext);
 
     const [inputValue, setInputValue] = useState(entry.description);
     const [status, setStatus] = useState<EntryStatus>(entry.status);
@@ -50,6 +50,12 @@ const EntryPage: FC<Props> = ({ entry }) => {
         }
         updateEntry(updatedEntry, true);
         setInputValue('');
+    }
+
+
+    const onDelete = () => {
+        console.log('Funciona')
+        deleteEntry(entry, true)
     }
 
     return (
@@ -109,10 +115,13 @@ const EntryPage: FC<Props> = ({ entry }) => {
                 bottom: 30,
                 right: 30,
                 backgroundColor: 'error.dark'
-            }}>
+
+            }} onClick={onDelete} >
                 <DeleteOutlinedIcon />
+
+
             </IconButton>
-        </Layout>
+        </Layout >
     )
 }
 
